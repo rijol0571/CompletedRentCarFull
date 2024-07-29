@@ -13,6 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model File {
   id             String   @id @default(uuid()) @db.Uuid
   url            String
@@ -20,7 +21,7 @@ model File {
   size           Int
   carId          String   @db.Uuid
   createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt
+  lastEditedAt   DateTime @updatedAt @default(now())
   car            Car      @relation(fields: [carId], references: [id])
 }
 
@@ -31,7 +32,7 @@ model User {
   avatar         String
   role           UserRole
   createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt
+  lastEditedAt   DateTime @updatedAt @default(now())
   companies      Company[] @relation("CompanyOwner")
   transactions   Transaction[] @relation("UserTransactions")
 }
@@ -42,7 +43,7 @@ model Company {
   ownerId        String   @db.Uuid
   logo           String
   createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt
+  lastEditedAt   DateTime @updatedAt @default(now())
   owner          User     @relation("CompanyOwner", fields: [ownerId], references: [id])
   models         Model[]
   cars           Car[]    @relation("CompanyCars")
@@ -54,7 +55,7 @@ model Model {
   name           String
   companyId      String   @db.Uuid
   createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt
+  lastEditedAt   DateTime @updatedAt @default(now())
   company        Company  @relation(fields: [companyId], references: [id])
   cars           Car[]
 }
@@ -66,7 +67,7 @@ model Car {
   companyId      String   @db.Uuid
   info           String
   createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt
+  lastEditedAt   DateTime @updatedAt @default(now())
   model          Model    @relation(fields: [modelId], references: [id])
   company        Company  @relation("CompanyCars", fields: [companyId], references: [id])
   files          File[]
@@ -85,12 +86,20 @@ model Transaction {
   endDate        DateTime
   status         TransactionStatus
   createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt
+  lastEditedAt   DateTime @updatedAt @default(now())
   createdBy      String   @db.Uuid
   lastEditedBy   String   @db.Uuid
   company        Company  @relation("CompanyTransactions", fields: [companyId], references: [id])
   user           User     @relation("UserTransactions", fields: [userId], references: [id])
   car            Car      @relation("CarTransactions", fields: [carId], references: [id])
+}
+
+model Auth{
+  id             String   @id @default(uuid()) @db.Uuid
+  email          String   @unique
+  password       String
+  createdAt      DateTime @default(now())
+  lastEditedAt   DateTime @updatedAt @default(now())
 }
 
 enum UserRole {
