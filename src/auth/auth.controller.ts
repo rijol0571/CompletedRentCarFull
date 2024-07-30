@@ -21,6 +21,10 @@ export class AuthController {
   signIn(@Body() createAuthDto: Prisma.AuthCreateInput) {
     return this.authService.signIn(createAuthDto);
   }
+  @Post('forget-password')
+  forgetPassword(@Body() email:string) {
+    return this.authService.forgetPassword(email);
+  }
 
   @UseGuards(AccessTokenGuard)
   @Get()

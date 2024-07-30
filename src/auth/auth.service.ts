@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { Auth, Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
@@ -74,6 +75,32 @@ export class AuthService {
     const refreshToken = await this.RefreshToken(payload);
 
     return { accessToken, refreshToken };
+  }
+
+  async forgetPassword(email:string){
+    const user=this.prisma.auth.findUnique({
+      where:{
+        email
+      }
+    })
+    if(!user){
+      throw new NotFoundException('User not Found')
+    }
+    const transporter=nodemailer.createTransport({
+      service:'Gmail',
+      auth: {
+        user: 'your-email@gmail.com',
+        pass: 'your-email-password',
+      },
+    })
+    await transporter.sendMail({
+      from: 'your-email@gmail.com',
+      to: (await user).email,
+      subject: 'Password Reset Request',
+      html: `Enter thr reset password`,
+    })
+    return { message: 'Password reset email sent' };
+
   }
 
   async findAll() {
