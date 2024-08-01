@@ -13,93 +13,116 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model File {
-  id             String   @id @default(uuid()) @db.Uuid
-  url            String
-  mimetype       String
-  size           Int
-  carId          String   @db.Uuid
-  createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt @default(now())
-  car            Car      @relation(fields: [carId], references: [id])
+  id           String   @id @default(uuid()) @db.Uuid
+  url          String
+  mimetype     String
+  size         Int
+  carId        String   @db.Uuid
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @updatedAt @default(now())
+  car          Car      @relation(fields: [carId], references: [id])
 }
 
 model User {
-  id             String   @id @default(uuid()) @db.Uuid
-  phone          String
-  fullName       String
-  avatar         String
-  role           UserRole
-  createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt @default(now())
-  companies      Company[] @relation("CompanyOwner")
-  transactions   Transaction[] @relation("UserTransactions")
+  id           String   @id @default(uuid()) @db.Uuid
+  phone        String
+  fullName     String
+  avatar       String
+  role         UserRole
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @updatedAt @default(now())
+  companies    Company[] @relation("CompanyOwner")
+  transactions Transaction[] @relation("UserTransactions")
 }
 
 model Company {
-  id             String   @id @default(uuid()) @db.Uuid
-  name           String
-  ownerId        String   @db.Uuid
-  logo           String
-  createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt @default(now())
-  owner          User     @relation("CompanyOwner", fields: [ownerId], references: [id])
-  models         Model[]
-  cars           Car[]    @relation("CompanyCars")
-  transactions   Transaction[] @relation("CompanyTransactions")
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  ownerId      String   @db.Uuid
+  logo         String
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @updatedAt @default(now())
+  owner        User     @relation("CompanyOwner", fields: [ownerId], references: [id])
+  models       Model[]
+  cars         Car[]    @relation("CompanyCars")
+  transactions Transaction[] @relation("CompanyTransactions")
 }
 
 model Model {
-  id             String   @id @default(uuid()) @db.Uuid
-  name           String
-  companyId      String   @db.Uuid
-  createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt @default(now())
-  company        Company  @relation(fields: [companyId], references: [id])
-  cars           Car[]
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  companyId    String   @db.Uuid
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @updatedAt @default(now())
+  company      Company  @relation(fields: [companyId], references: [id])
+  cars         Car[]
 }
 
 model Car {
-  id             String   @id @default(uuid()) @db.Uuid
-  name           String
-  modelId        String   @db.Uuid
-  companyId      String   @db.Uuid
-  info           String
-  createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt @default(now())
-  model          Model    @relation(fields: [modelId], references: [id])
-  company        Company  @relation("CompanyCars", fields: [companyId], references: [id])
-  files          File[]
-  transactions   Transaction[] @relation("CarTransactions")
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  modelId      String   @db.Uuid
+  companyId    String   @db.Uuid
+  info         String
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @updatedAt @default(now())
+  model        Model    @relation(fields: [modelId], references: [id])
+  company      Company  @relation("CompanyCars", fields: [companyId], references: [id])
+  files        File[]
+  transactions Transaction[] @relation("CarTransactions")
+  brand        Brand?   @relation(fields: [brandId], references: [id])
+  brandId      String?  @db.Uuid
+  carImages    CarImage[]
 }
 
 model Transaction {
-  id             String   @id @default(uuid()) @db.Uuid
-  companyId      String   @db.Uuid
-  userId         String   @db.Uuid
-  userData       Json
-  carId          String   @db.Uuid
-  carData        Json
-  price          Float
-  startDate      DateTime
-  endDate        DateTime
-  status         TransactionStatus
-  createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt @default(now())
-  createdBy      String   @db.Uuid
-  lastEditedBy   String   @db.Uuid
-  company        Company  @relation("CompanyTransactions", fields: [companyId], references: [id])
-  user           User     @relation("UserTransactions", fields: [userId], references: [id])
-  car            Car      @relation("CarTransactions", fields: [carId], references: [id])
+  id           String   @id @default(uuid()) @db.Uuid
+  companyId    String   @db.Uuid
+  userId       String   @db.Uuid
+  userData     Json
+  carId        String   @db.Uuid
+  carData      Json
+  price        Float
+  startDate    DateTime
+  endDate      DateTime
+  status       TransactionStatus
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @updatedAt @default(now())
+  createdBy    String   @db.Uuid
+  lastEditedBy String   @db.Uuid
+  company      Company  @relation("CompanyTransactions", fields: [companyId], references: [id])
+  user         User     @relation("UserTransactions", fields: [userId], references: [id])
+  car          Car      @relation("CarTransactions", fields: [carId], references: [id])
 }
 
-model Auth{
-  id             String   @id @default(uuid()) @db.Uuid
-  email          String   @unique
-  password       String
-  createdAt      DateTime @default(now())
-  lastEditedAt   DateTime @updatedAt @default(now())
+model Auth {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  password     String
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @updatedAt @default(now())
+}
+
+model Brand {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  cars         Car[]
+}
+
+model CarImage {
+  id           String   @id @default(uuid()) @db.Uuid
+  carId        String   @db.Uuid
+  url          String
+  mimetype     String
+  size         Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  car          Car      @relation(fields: [carId], references: [id])
 }
 
 enum UserRole {
@@ -113,4 +136,5 @@ enum TransactionStatus {
   debit
   credit
 }
+
 
