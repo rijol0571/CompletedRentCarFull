@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
 import { SignUpAuthDto } from './dto/sign_up.dto';
 import { SignInAuthDto } from './dto/sign_in.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -17,15 +18,15 @@ export class AuthService {
   async RefreshToken(payload: Record<string, any>): Promise<string> {
     const token = await this.jwtService.signAsync(payload, {
       secret: process.env.REFRESH_TOKEN_SECRET || '12345',
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN||'15h',
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '15h',
     });
     return token;
   }
 
   async AccessToken(payload: Record<string, any>): Promise<string> {
-    const token = await this.jwtService.signAsync(payload,{
+    const token = await this.jwtService.signAsync(payload, {
       secret: process.env.ACCESS_TOKEN_SECRET || '12345',
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN||'15m',
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '15m',
     });
     return token;
   }
@@ -45,7 +46,6 @@ export class AuthService {
   }
 
   async signUp(createAuthDto: SignUpAuthDto): Promise<Omit<Prisma.AuthCreateInput, 'password'>> {
-    
     const hashedPassword = await bcrypt.hash(createAuthDto.password, 10);
     const user = await this.prisma.auth.create({
       data: {
@@ -79,30 +79,53 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async forgetPassword(email:string){
-    const user=this.prisma.auth.findUnique({
-      where:{
-        email
-      }
-    })
-    if(!user){
-      throw new NotFoundException('User not Found')
+  async forgetPassword(email: string): Promise<{ message: string }> {
+    const user = await this.prisma.auth.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
-    const transporter=nodemailer.createTransport({
-      service:'Gmail',
+
+    const resetToken = uuidv4();
+    const resetTokenExpiry = new Date();
+    resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1);
+
+    await this.prisma.auth.update({
+      where: { email },
+      data: { resetToken, resetTokenExpiry },
+    });
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}&email=${email}`;
+
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
       auth: {
-        user: process.env.SENDER_EMAIL ,
+        user: process.env.SENDER_EMAIL,
         pass: process.env.SENDER_PASSWORD,
       },
-    })
-    await transporter.sendMail({
-      from: 'your-email@gmail.com',
-      to: (await user).email,
-      subject: 'Password Reset Request',
-      html: `Enter the reset password`,
-    })
-    return { message: 'Password reset email sent' };
+    });
 
+    await transporter.sendMail({
+      from: process.env.SENDER_EMAIL,
+      to: user.email,
+      subject: 'Password Reset Request',
+      html: `Hi there,
+
+We received a request to reset your password. Click the link below to set a new password:
+
+<a href="${resetLink}">Reset Password</a>
+
+This link is valid for the next 1 hour. If you did not request a password reset, please ignore this email or contact our support team.
+
+Best regards,
+[Your Company Name]`,
+    });
+
+    return { message: 'Password reset email sent' };
   }
 
   async findAll() {
