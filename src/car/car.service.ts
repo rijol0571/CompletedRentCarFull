@@ -9,7 +9,7 @@ import { types } from 'util';
 export class CarService {
   constructor(private readonly prisma: PrismaService){}
 
-  async create(createCarDto: Prisma.CarCreateInput):Promise<Car> {
+  async create(createCarDto: CreateCarDto):Promise<Car> {
     const car= await this.prisma.car.create({
       data:createCarDto
     })

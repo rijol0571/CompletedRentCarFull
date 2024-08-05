@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import {  CarImage, Prisma } from '@prisma/client';
+import { CreateCarImageDto } from './dto/create-car_image.dto';
 
 @Injectable()
 export class CarImageService {
   constructor(private readonly prisma: PrismaService){}
 
-  async create(createCarDto: Prisma.CarImageCreateInput):Promise<CarImage> {
+  async create(createCarDto: CreateCarImageDto):Promise<CarImage> {
     const car= await this.prisma.carImage.create({
       data:createCarDto
     })

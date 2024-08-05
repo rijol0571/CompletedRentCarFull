@@ -17,35 +17,42 @@ model File {
   id           String   @id @default(uuid()) @db.Uuid
   url          String
   mimetype     String
-  size         Int
+  size         String
   carId        String   @db.Uuid
   createdAt    DateTime @default(now())
-  lastEditedAt DateTime @updatedAt @default(now())
+  lastEditedAt DateTime @default(now()) @updatedAt
   car          Car      @relation(fields: [carId], references: [id])
 }
 
 model User {
-  id           String   @id @default(uuid()) @db.Uuid
-  phone        String
-  fullName     String
-  avatar       String
-  role         UserRole
-  createdAt    DateTime @default(now())
-  lastEditedAt DateTime @updatedAt @default(now())
-  companies    Company[] @relation("CompanyOwner")
-  transactions Transaction[] @relation("UserTransactions")
+  id                 String              @id @default(uuid()) @db.Uuid
+  phone              String
+  fullName           String
+  avatar             String
+  role               UserRole
+  createdAt          DateTime            @default(now())
+  lastEditedAt       DateTime            @default(now()) @updatedAt
+  companies          Company[]           @relation("CompanyOwner")
+  transactions       Transaction[]       @relation("UserTransactions")
+  carFindex          CarFindex[]
+  contacts           Contacts[]
+  findex             Findex[]
+  Payments           Payments[]
+  rentals            Rentals[]
+  emailVertification EmailVerification[]
+  tokenManagement    TokenManagement[]
 }
 
 model Company {
-  id           String   @id @default(uuid()) @db.Uuid
+  id           String        @id @default(uuid()) @db.Uuid
   name         String
-  ownerId      String   @db.Uuid
+  ownerId      String        @db.Uuid
   logo         String
-  createdAt    DateTime @default(now())
-  lastEditedAt DateTime @updatedAt @default(now())
-  owner        User     @relation("CompanyOwner", fields: [ownerId], references: [id])
+  createdAt    DateTime      @default(now())
+  lastEditedAt DateTime      @default(now()) @updatedAt
+  owner        User          @relation("CompanyOwner", fields: [ownerId], references: [id])
   models       Model[]
-  cars         Car[]    @relation("CompanyCars")
+  cars         Car[]         @relation("CompanyCars")
   transactions Transaction[] @relation("CompanyTransactions")
 }
 
@@ -54,46 +61,48 @@ model Model {
   name         String
   companyId    String   @db.Uuid
   createdAt    DateTime @default(now())
-  lastEditedAt DateTime @updatedAt @default(now())
+  lastEditedAt DateTime @default(now()) @updatedAt
   company      Company  @relation(fields: [companyId], references: [id])
   cars         Car[]
 }
 
 model Car {
-  id           String   @id @default(uuid()) @db.Uuid
+  id           String        @id @default(uuid()) @db.Uuid
   name         String
-  modelId      String   @db.Uuid
-  companyId    String   @db.Uuid
+  modelId      String        @db.Uuid
+  companyId    String        @db.Uuid
   info         String
-  createdAt    DateTime @default(now())
-  lastEditedAt DateTime @updatedAt @default(now())
-  model        Model    @relation(fields: [modelId], references: [id])
-  company      Company  @relation("CompanyCars", fields: [companyId], references: [id])
+  createdAt    DateTime      @default(now())
+  lastEditedAt DateTime      @default(now()) @updatedAt
+  model        Model         @relation(fields: [modelId], references: [id])
+  company      Company       @relation("CompanyCars", fields: [companyId], references: [id])
   files        File[]
   transactions Transaction[] @relation("CarTransactions")
-  brand        Brand?   @relation(fields: [brandId], references: [id])
-  brandId      String?  @db.Uuid
+  brand        Brand?        @relation(fields: [brandId], references: [id])
+  brandId      String?       @db.Uuid
   carImages    CarImage[]
+  carFindex    CarFindex[]
+  rentals      Rentals[]
 }
 
 model Transaction {
-  id           String   @id @default(uuid()) @db.Uuid
-  companyId    String   @db.Uuid
-  userId       String   @db.Uuid
+  id           String            @id @default(uuid()) @db.Uuid
+  companyId    String            @db.Uuid
+  userId       String            @db.Uuid
   userData     Json
-  carId        String   @db.Uuid
+  carId        String            @db.Uuid
   carData      Json
-  price        Float
+  price        String
   startDate    DateTime
   endDate      DateTime
   status       TransactionStatus
-  createdAt    DateTime @default(now())
-  lastEditedAt DateTime @updatedAt @default(now())
-  createdBy    String   @db.Uuid
-  lastEditedBy String   @db.Uuid
-  company      Company  @relation("CompanyTransactions", fields: [companyId], references: [id])
-  user         User     @relation("UserTransactions", fields: [userId], references: [id])
-  car          Car      @relation("CarTransactions", fields: [carId], references: [id])
+  createdAt    DateTime          @default(now())
+  lastEditedAt DateTime          @default(now()) @updatedAt
+  createdBy    String            @db.Uuid
+  lastEditedBy String            @db.Uuid
+  company      Company           @relation("CompanyTransactions", fields: [companyId], references: [id])
+  user         User              @relation("UserTransactions", fields: [userId], references: [id])
+  car          Car               @relation("CarTransactions", fields: [carId], references: [id])
 }
 
 model Auth {
@@ -101,28 +110,117 @@ model Auth {
   email        String   @unique
   password     String
   createdAt    DateTime @default(now())
-  lastEditedAt DateTime @updatedAt @default(now())
+  lastEditedAt DateTime @default(now()) @updatedAt
 }
 
 model Brand {
-  id           String   @id @default(uuid()) @db.Uuid
-  name         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  cars         Car[]
+  cars Car[]
 }
 
 model CarImage {
-  id           String   @id @default(uuid()) @db.Uuid
-  carId        String   @db.Uuid
-  url          String
-  mimetype     String
-  size         Float
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        String   @id @default(uuid()) @db.Uuid
+  carId     String   @db.Uuid
+  url       String
+  mimetype  String
+  size      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  car          Car      @relation(fields: [carId], references: [id])
+  car Car @relation(fields: [carId], references: [id])
+}
+
+model CarFindex {
+  id        String   @id @default(uuid()) @db.Uuid
+  carId     String   @db.Uuid
+  userId    String   @db.Uuid
+  score     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  car       Car      @relation(fields: [carId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Colours {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Contacts {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  phone     String
+  email     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Customers {
+  id        String   @id @default(uuid()) @db.Uuid
+  fullname  String
+  phone     String
+  email     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Findex {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  score     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Payments {
+  id        String        @id @default(uuid()) @db.Uuid
+  userId    String        @db.Uuid
+  amount    Int
+  method    String
+  status    PaymentStatus
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now()) @updatedAt
+  user      User          @relation(fields: [userId], references: [id])
+}
+
+model Rentals {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String       @db.Uuid
+  carId       String       @db.Uuid
+  start_date  DateTime
+  end_date    DateTime
+  total_price Int
+  status      RentalStatus
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  user        User         @relation(fields: [userId], references: [id])
+  car         Car          @relation(fields: [carId], references: [id])
+}
+
+model EmailVerification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model TokenManagement {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 enum UserRole {
@@ -132,9 +230,19 @@ enum UserRole {
   admin
 }
 
+enum PaymentStatus {
+  failed
+  pending
+  completed
+}
+
+enum RentalStatus {
+  active
+  completed
+  cancelled
+}
+
 enum TransactionStatus {
   debit
   credit
 }
-
-

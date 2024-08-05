@@ -5,20 +5,22 @@ import { SignInAuthDto } from './dto/sign_in.dto';
 import { Prisma } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { AccessTokenGuard } from './common/guards/accessToken';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('auth')
+@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   
   @Post('sign-up')
-  signUp(@Body() createAuthDto: Prisma.AuthCreateInput) {
+  signUp(@Body() createAuthDto: SignUpAuthDto) {
     return this.authService.signUp(createAuthDto);
   }
 
   @Post('sign-in')
-  signIn(@Body() createAuthDto: Prisma.AuthCreateInput) {
+  signIn(@Body() createAuthDto: SignInAuthDto) {
     return this.authService.signIn(createAuthDto);
   }
   @Post('forget-password')

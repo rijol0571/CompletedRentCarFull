@@ -4,6 +4,8 @@ import { Auth, Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
+import { SignUpAuthDto } from './dto/sign_up.dto';
+import { SignInAuthDto } from './dto/sign_in.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,8 +16,8 @@ export class AuthService {
 
   async RefreshToken(payload: Record<string, any>): Promise<string> {
     const token = await this.jwtService.signAsync(payload, {
-      secret: '12345',
-      expiresIn: '15h',
+      secret: process.env.REFRESH_TOKEN_SECRET || '12345',
+      expiresIn: process.env.REFRESH_TOKEN_SECRET||'15h',
     });
     return token;
   }
@@ -42,12 +44,12 @@ export class AuthService {
     return null;
   }
 
-  async signUp(createModelDto: Prisma.AuthCreateInput): Promise<Omit<Prisma.AuthCreateInput, 'password'>> {
+  async signUp(createAuthDto: SignUpAuthDto): Promise<Omit<Prisma.AuthCreateInput, 'password'>> {
     
-    const hashedPassword = await bcrypt.hash(createModelDto.password, 10);
+    const hashedPassword = await bcrypt.hash(createAuthDto.password, 10);
     const user = await this.prisma.auth.create({
       data: {
-        ...createModelDto,
+        ...createAuthDto,
         password: hashedPassword,
       },
     });
@@ -55,7 +57,7 @@ export class AuthService {
     return result;
   }
 
-  async signIn(signInDto: Prisma.AuthCreateInput): Promise<{ accessToken: string; refreshToken: string }> {
+  async signIn(signInDto: SignInAuthDto): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.prisma.auth.findUnique({
       where: {
         email: signInDto.email,
@@ -97,7 +99,7 @@ export class AuthService {
       from: 'your-email@gmail.com',
       to: (await user).email,
       subject: 'Password Reset Request',
-      html: `Enter thr reset password`,
+      html: `Enter the reset password`,
     })
     return { message: 'Password reset email sent' };
 

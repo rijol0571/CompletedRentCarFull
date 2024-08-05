@@ -3,13 +3,15 @@ import { ModelService } from './model.service';
 import { CreateModelDto } from './dto/create-model.dto';
 import { UpdateModelDto } from './dto/update-model.dto';
 import { Prisma } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('model')
 @Controller('model')
 export class ModelController {
   constructor(private readonly modelService: ModelService) {}
 
   @Post()
-  create(@Body() createModelDto: Prisma.ModelCreateInput) {
+  create(@Body() createModelDto:CreateModelDto) {
     return this.modelService.create(createModelDto);
   }
 

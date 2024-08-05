@@ -8,7 +8,7 @@ import { Prisma } from '@prisma/client';
 export class ModelService {
   constructor(private readonly prisma:PrismaService){}
 
-  async create(createModelDto: Prisma.ModelCreateInput) {
+  async create(createModelDto: CreateModelDto) {
     const file=await this.prisma.model.create({
       data:createModelDto
     })

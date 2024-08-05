@@ -3,13 +3,15 @@ import { FileService } from './file.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { Prisma } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('file')
 @Controller('file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Post()
-  create(@Body() createFileDto: Prisma.FileCreateInput) {
+  create(@Body() createFileDto: CreateFileDto) {
     return this.fileService.create(createFileDto);
   }
 

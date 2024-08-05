@@ -8,7 +8,7 @@ import { Company, Prisma } from '@prisma/client';
 export class CompanyService {
   constructor(private readonly prisma:PrismaService){}
 
-  async create(createCompanyDto: Prisma.CompanyCreateInput):Promise<Company> {
+  async create(createCompanyDto: CreateCompanyDto):Promise<Company> {
     const company=await this.prisma.company.create({
       data:createCompanyDto
     })

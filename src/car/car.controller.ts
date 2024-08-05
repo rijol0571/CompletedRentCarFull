@@ -3,13 +3,15 @@ import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { Prisma } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('car')
 @Controller('car')
 export class CarController {
   constructor(private readonly carService: CarService) {}
 
   @Post()
-  create(@Body() createCarDto: Prisma.CarCreateInput) {
+  create(@Body() createCarDto: CreateCarDto) {
     return this.carService.create(createCarDto);
   }
 

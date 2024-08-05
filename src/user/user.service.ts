@@ -8,7 +8,7 @@ import { Prisma } from '@prisma/client';
 export class UserService {
   constructor(private readonly prisma:PrismaService){}
 
-  async create(createModelDto: Prisma.UserCreateInput) {
+  async create(createModelDto: CreateUserDto) {
     const user=await this.prisma.user.create({
       data:createModelDto
     })

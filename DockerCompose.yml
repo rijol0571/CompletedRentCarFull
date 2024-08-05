@@ -1,0 +1,21 @@
+services:
+  node:
+    image: node
+    container_name: node-demo-test
+    ports: -6000:3000
+    depends_on: -redis
+    environment:
+      - DEBUG-1
+      - PORT-2
+    env_file:
+      - .env
+redis: image:redis container_name:redis-demo
+db:
+  image: postgres
+  container_name: db-psql
+  environment: -POSTGRES_PASSWORD=password
+os:
+  image: ubuntu
+  container_name: ubuntu-os
+networks:
+  

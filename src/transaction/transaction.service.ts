@@ -8,7 +8,7 @@ import { Prisma, Transaction } from '@prisma/client';
 export class TransactionService {
   constructor(private readonly prisma:PrismaService){}
 
-  async create(createTransactionDto: Prisma.TransactionCreateInput) {
+  async create(createTransactionDto:Prisma.TransactionCreateInput) {
     const transaction=await this.prisma.transaction.create({
       data:createTransactionDto
     })

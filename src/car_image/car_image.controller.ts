@@ -3,13 +3,15 @@ import { CarImageService } from './car_image.service';
 import { CreateCarImageDto } from './dto/create-car_image.dto';
 import { UpdateCarImageDto } from './dto/update-car_image.dto';
 import { Prisma } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('car-image')
 @Controller('car-image')
 export class CarImageController {
   constructor(private readonly carImageService: CarImageService) {}
 
   @Post()
-  create(@Body() createCarImageDto: Prisma.CarImageCreateInput) {
+  create(@Body() createCarImageDto: CreateCarImageDto) {
     return this.carImageService.create(createCarImageDto);
   }
 
