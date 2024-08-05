@@ -17,15 +17,15 @@ export class AuthService {
   async RefreshToken(payload: Record<string, any>): Promise<string> {
     const token = await this.jwtService.signAsync(payload, {
       secret: process.env.REFRESH_TOKEN_SECRET || '12345',
-      expiresIn: process.env.REFRESH_TOKEN_SECRET||'15h',
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN||'15h',
     });
     return token;
   }
 
   async AccessToken(payload: Record<string, any>): Promise<string> {
     const token = await this.jwtService.signAsync(payload,{
-      secret: '12345',
-      expiresIn: '15m',
+      secret: process.env.ACCESS_TOKEN_SECRET || '12345',
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN||'15m',
     });
     return token;
   }
@@ -91,8 +91,8 @@ export class AuthService {
     const transporter=nodemailer.createTransport({
       service:'Gmail',
       auth: {
-        user: 'your-email@gmail.com',
-        pass: 'your-email-password',
+        user: process.env.SENDER_EMAIL ,
+        pass: process.env.SENDER_PASSWORD,
       },
     })
     await transporter.sendMail({
