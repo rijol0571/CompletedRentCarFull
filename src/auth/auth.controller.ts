@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpAuthDto } from './dto/sign_up.dto';
 import { SignInAuthDto } from './dto/sign_in.dto';
-import { Prisma } from '@prisma/client';
-import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from './common/guards/accessToken';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { QueryDto } from './dto/query_filer.dto';
+import { log } from 'console';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -13,7 +13,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  
   @Post('sign-up')
   signUp(@Body() createAuthDto: SignUpAuthDto) {
     return this.authService.signUp(createAuthDto);
@@ -23,8 +22,9 @@ export class AuthController {
   signIn(@Body() createAuthDto: SignInAuthDto) {
     return this.authService.signIn(createAuthDto);
   }
+
   @Post('forget-password')
-  forgetPassword(@Body() email:string) {
+  forgetPassword(@Body() email: string) {
     return this.authService.forgetPassword(email);
   }
 
@@ -32,26 +32,45 @@ export class AuthController {
   resetPassword(@Body() resetPasswordDto: { token: string; newPassword: string }) {
     return this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.newPassword);
   }
-  
+
+  // @UseGuards(AccessTokenGuard)
+  @Get()
+  @ApiQuery({ name: 'filter', required: false, description: 'Filter by email or username' })
+  @ApiQuery({ name: 'sortBy', required: false, description: 'Sort by field name' })
+  @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'], description: 'Order of sorting' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', example: 10 })
+  findAll(@Query() query: QueryDto) {
+    console.log('Received query:', query); 
+
+    const { filter, sortBy, order, page, limit } = query;
+
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+
+    console.log('Converted pageNum:', pageNum);
+    console.log('Converted limitNum:', limitNum);
+    return this.authService.findAll({ filter, sortBy, order, page: pageNum, limit: limitNum });
+
+  }
 
   @UseGuards(AccessTokenGuard)
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-  @UseGuards(AccessTokenGuard)  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.authService.findOne(id);
   }
-  @UseGuards(AccessTokenGuard)  
+
+  @UseGuards(AccessTokenGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAuthDto: SignInAuthDto) {
     return this.authService.update(id, updateAuthDto);
   }
-  @UseGuards(AccessTokenGuard)  
+
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.authService.remove(id);
   }
 }
+
+

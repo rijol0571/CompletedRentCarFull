@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Auth, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
 import { SignUpAuthDto } from './dto/sign_up.dto';
 import { SignInAuthDto } from './dto/sign_in.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { QueryDto } from './dto/query_filer.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,9 +34,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.auth.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -59,9 +58,7 @@ export class AuthService {
 
   async signIn(signInDto: SignInAuthDto): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.prisma.auth.findUnique({
-      where: {
-        email: signInDto.email,
-      },
+      where: { email: signInDto.email },
     });
 
     if (!user || !(await bcrypt.compare(signInDto.password, user.password))) {
@@ -81,9 +78,7 @@ export class AuthService {
 
   async forgetPassword(email: string): Promise<{ message: string }> {
     const user = await this.prisma.auth.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (!user) {
@@ -132,72 +127,75 @@ Best regards,
     const user = await this.prisma.auth.findFirst({
       where: { resetToken: token },
     });
-  
+
     if (!user || new Date() > user.resetTokenExpiry) {
       throw new NotFoundException('Invalid or expired reset token');
     }
-  
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await this.prisma.auth.update({
       where: { id: user.id },
       data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null },
     });
-  
+
     return { message: 'Password successfully reset' };
   }
+
+  async findAll(query: {
+    filter?: string;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
+    page?: number;
+    limit?: number;
+  }) {
+    const { filter, sortBy, order, page = 1, limit = 10 } = query;
+  
+    const where: Prisma.AuthWhereInput = filter
+      ? {
+          OR: [
+            { email: { contains: filter, mode: 'insensitive' } },
+          ],
+        }
+      : {};
+  
+    const orderBy = sortBy ? { [sortBy]: order || 'asc' } : undefined;
+  
+    const total = await this.prisma.auth.count({ where });
+  
+    const items = await this.prisma.auth.findMany({
+      where,
+      orderBy,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  
+    return { total, items };
+  }
   
 
-  async findAll() {
-    return this.prisma.auth.findMany();
-  }
-
   async findOne(id: string) {
-    return this.prisma.auth.findUnique({
-      where: {
-        id,
-      },
-    });
-  }
-
-  async update(id: string, data: any) {
     const user = await this.prisma.auth.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    return user;
+  }
 
-    if (data.password) {
-      data.password = await bcrypt.hash(data.password, 10);
-    }
-
-    return this.prisma.auth.update({
-      where: {
-        id,
-      },
-      data,
+  async update(id: string, updateAuthDto: SignInAuthDto) {
+    const user = await this.prisma.auth.update({
+      where: { id },
+      data: updateAuthDto,
     });
+    return user;
   }
 
   async remove(id: string) {
-    const user = await this.prisma.auth.findUnique({
-      where: {
-        id,
-      },
+    const user = await this.prisma.auth.delete({
+      where: { id },
     });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    return this.prisma.auth.delete({
-      where: {
-        id,
-      },
-    });
+    return user;
   }
 }
 
