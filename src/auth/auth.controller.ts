@@ -28,6 +28,12 @@ export class AuthController {
     return this.authService.forgetPassword(email);
   }
 
+  @Post('reset-password')
+  resetPassword(@Body() resetPasswordDto: { token: string; newPassword: string }) {
+    return this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.newPassword);
+  }
+  
+
   @UseGuards(AccessTokenGuard)
   @Get()
   findAll() {

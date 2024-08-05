@@ -99,7 +99,7 @@ export class AuthService {
       data: { resetToken, resetTokenExpiry },
     });
 
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}&email=${email}`;
+    const resetLink = `${process.env.FORGET_URL}/reset-password?token=${resetToken}&email=${email}`;
 
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
@@ -127,6 +127,25 @@ Best regards,
 
     return { message: 'Password reset email sent' };
   }
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    const user = await this.prisma.auth.findFirst({
+      where: { resetToken: token },
+    });
+  
+    if (!user || new Date() > user.resetTokenExpiry) {
+      throw new NotFoundException('Invalid or expired reset token');
+    }
+  
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.prisma.auth.update({
+      where: { id: user.id },
+      data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null },
+    });
+  
+    return { message: 'Password successfully reset' };
+  }
+  
 
   async findAll() {
     return this.prisma.auth.findMany();
