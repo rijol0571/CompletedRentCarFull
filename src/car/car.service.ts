@@ -16,8 +16,35 @@ export class CarService {
     return car
   }
 
-  async findAll() {
-    return this.prisma.car.findMany()
+  async findAll(query: {
+    filter?: string;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
+    page?: number;
+    limit?: number;
+  }) {
+    const { filter, sortBy, order, page = 1, limit = 10 } = query;
+  
+    const where: Prisma.CarWhereInput = filter
+      ? {
+          OR: [
+            { name: { contains: filter, mode: 'insensitive' } },
+          ],
+        }
+      : {};
+  
+    const orderBy = sortBy ? { [sortBy]: order || 'asc' } : undefined;
+  
+    const total = await this.prisma.car.count({ where });
+  
+    const items = await this.prisma.car.findMany({
+      where,
+      orderBy,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  
+    return { total, items };
   }
 
   async findOne(id: string) {

@@ -1,7 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsString, IsUrl } from "class-validator"
+import { IsString, IsUrl, IsUUID } from "class-validator"
 
 export class CreateFileDto {
+
+    @ApiProperty({ type: 'string', format: 'binary' })
+    file: any;
 
     @IsString()
     @ApiProperty()
@@ -18,5 +21,9 @@ export class CreateFileDto {
     @IsString()
     @ApiProperty()
     mimetype: string
+
+    @IsString()
+    @ApiProperty()
+    userId: string
 
 }

@@ -10,7 +10,7 @@ export class FileService {
 
   async create(createFileDto: CreateFileDto) {
     const file=await this.prisma.file.create({
-      data:createFileDto
+      data: createFileDto
     })
     return file
   }

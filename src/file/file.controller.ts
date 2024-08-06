@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, BadRequestException, UploadedFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, UploadedFile, UseInterceptors, Res } from '@nestjs/common';
 import { FileService } from './file.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
-import { Prisma } from '@prisma/client';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -16,32 +15,45 @@ export class FileController {
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('file',{
-      storage:diskStorage({
-        destination:'./uploads',
-        filename:(req, file, callback)=>{
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = file.originalname.split('.').pop();
           callback(null, `${file.fieldname}-${uniqueSuffix}.${ext}`);
-        }
+        },
       }),
-      fileFilter:(req, file, callback)=>{
+      fileFilter: (req, file, callback) => {
         const allowedTypes = ['image/jpeg', 'application/pdf', 'video/mp4', 'image/png', 'image/jpg'];
         if (!allowedTypes.includes(file.mimetype)) {
           return callback(new BadRequestException('Unsupported file type'), false);
         }
         callback(null, true);
-      }
+      },
     })
   )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Upload a file',
+    type: CreateFileDto,
+  })
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createFileDto: CreateFileDto
+  ) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
 
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     const createFileUploadDto = {
       filename: file.filename,
       originalname: file.originalname,
       path: file.path,
       mimetype: file.mimetype,
+      ...createFileDto,
     };
+
     return this.fileService.create(createFileUploadDto);
   }
 
@@ -71,3 +83,4 @@ export class FileController {
     return res.download(filePath);
   }
 }
+
