@@ -15,13 +15,13 @@ datasource db {
 
 model File {
   id           String   @id @default(uuid()) @db.Uuid
-  url          String
+  filename     String
+  originalname String
+  path         String
   mimetype     String
-  size         String
-  carId        String   @db.Uuid
   createdAt    DateTime @default(now())
   lastEditedAt DateTime @default(now()) @updatedAt
-  car          Car      @relation(fields: [carId], references: [id])
+
 }
 
 model User {
@@ -76,7 +76,6 @@ model Car {
   lastEditedAt DateTime      @default(now()) @updatedAt
   model        Model         @relation(fields: [modelId], references: [id])
   company      Company       @relation("CompanyCars", fields: [companyId], references: [id])
-  files        File[]
   transactions Transaction[] @relation("CarTransactions")
   brand        Brand?        @relation(fields: [brandId], references: [id])
   brandId      String?       @db.Uuid
