@@ -33,7 +33,7 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.newPassword);
   }
 
-  // @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Get()
   @ApiQuery({ name: 'filter', required: false, description: 'Filter by email or username' })
   @ApiQuery({ name: 'sortBy', required: false, description: 'Sort by field name' })
