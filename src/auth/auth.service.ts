@@ -9,6 +9,7 @@ import { SignInAuthDto } from './dto/sign_in.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { QueryDto } from './dto/query_filer.dto';
 import { forgetPasswordDto } from './dto/forget_password.dto';
+import { resetPasswordDto } from './dto/reset_password.dto';
 
 @Injectable()
 export class AuthService {
@@ -77,11 +78,9 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async forgetPassword(forget_password: forgetPasswordDto): Promise<{ message: string }> {
-    const email=forget_password.email
-    const user = await this.prisma.auth.findUnique({
-      where: { email },
-    });
+  async forgetPassword(forgetPasswordDto: forgetPasswordDto): Promise<{ message: string }> {
+    const email = forgetPasswordDto.email;
+    const user = await this.prisma.auth.findUnique({ where: { email } });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -119,16 +118,16 @@ We received a request to reset your password. Click the link below to set a new 
 This link is valid for the next 1 hour. If you did not request a password reset, please ignore this email or contact our support team.
 
 Best regards,
-[Your Company Name]`,
+[RentCar Company]`,
     });
 
     return { message: 'Password reset email sent' };
   }
 
-  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
-    const user = await this.prisma.auth.findFirst({
-      where: { resetToken: token },
-    });
+  async resetPassword(resetPassworddto: resetPasswordDto): Promise<{ message: string }> {
+    const token=resetPassworddto.token
+    const newPassword=resetPassworddto.newPassword
+    const user = await this.prisma.auth.findFirst({ where: { resetToken: token } });
 
     if (!user || new Date() > user.resetTokenExpiry) {
       throw new NotFoundException('Invalid or expired reset token');
@@ -142,6 +141,7 @@ Best regards,
 
     return { message: 'Password successfully reset' };
   }
+
 
   async findAll(query: {
     filter?: string;

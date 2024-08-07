@@ -7,6 +7,7 @@ import { AccessTokenGuard } from './common/guards/accessToken';
 import { QueryDto } from './dto/query_filer.dto';
 import { log } from 'console';
 import { forgetPasswordDto } from './dto/forget_password.dto';
+import { resetPasswordDto } from './dto/reset_password.dto';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -30,8 +31,8 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  resetPassword(@Body() resetPasswordDto: { token: string; newPassword: string }) {
-    return this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.newPassword);
+  resetPassword(@Body() resetPassworddto: resetPasswordDto) {
+    return this.authService.resetPassword(resetPassworddto);
   }
 
   @UseGuards(AccessTokenGuard)
