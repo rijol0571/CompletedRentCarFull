@@ -8,6 +8,7 @@ import { SignUpAuthDto } from './dto/sign_up.dto';
 import { SignInAuthDto } from './dto/sign_in.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { QueryDto } from './dto/query_filer.dto';
+import { forgetPasswordDto } from './dto/forget_password.dto';
 
 @Injectable()
 export class AuthService {
@@ -76,7 +77,8 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async forgetPassword(email: string): Promise<{ message: string }> {
+  async forgetPassword(forget_password: forgetPasswordDto): Promise<{ message: string }> {
+    const email=forget_password.email
     const user = await this.prisma.auth.findUnique({
       where: { email },
     });
@@ -97,7 +99,7 @@ export class AuthService {
     const resetLink = `${process.env.FORGET_URL}/reset-password?token=${resetToken}&email=${email}`;
 
     const transporter = nodemailer.createTransport({
-      service: 'Gmail',
+      service: 'ethereal',
       auth: {
         user: process.env.SENDER_EMAIL,
         pass: process.env.SENDER_PASSWORD,

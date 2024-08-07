@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from './common/guards/accessToken';
 import { QueryDto } from './dto/query_filer.dto';
 import { log } from 'console';
+import { forgetPasswordDto } from './dto/forget_password.dto';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -24,8 +25,8 @@ export class AuthController {
   }
 
   @Post('forget-password')
-  forgetPassword(@Body() email: string) {
-    return this.authService.forgetPassword(email);
+  forgetPassword(@Body() forgetPassword: forgetPasswordDto) {
+    return this.authService.forgetPassword(forgetPassword);
   }
 
   @Post('reset-password')

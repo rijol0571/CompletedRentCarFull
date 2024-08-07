@@ -11,7 +11,7 @@ import { Response } from 'express';
 @ApiTags('file')
 @Controller('file')
 export class FileController {
-  constructor(private readonly fileService: FileService) {}
+  constructor(private readonly fileService: FileService) { }
 
   @Post()
   @UseInterceptors(
@@ -53,6 +53,8 @@ export class FileController {
       mimetype: file.mimetype,
       ...createFileDto,
     };
+    console.log(file);
+
 
     return this.fileService.create(createFileUploadDto);
   }

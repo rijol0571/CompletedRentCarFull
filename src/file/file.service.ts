@@ -6,10 +6,10 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class FileService {
-  constructor(private readonly prisma:PrismaService){}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createFileDto: CreateFileDto) {
-    const file=await this.prisma.file.create({
+    const file = await this.prisma.file.create({
       data: createFileDto
     })
     return file
@@ -21,26 +21,26 @@ export class FileService {
 
   findOne(id: string) {
     return this.prisma.file.findUnique({
-      where:{
-        id:id
+      where: {
+        id: id
       }
     })
   }
 
-  async update(id: string, data:any) {
+  async update(id: string, data: any) {
 
-      const file=await this.prisma.file.findUnique({
-      where:{
-        id:id
+    const file = await this.prisma.file.findUnique({
+      where: {
+        id: id
       }
     })
 
-    if(!file){
+    if (!file) {
       throw new NotFoundException('Not found')
     }
 
     return this.prisma.file.update({
-      where:{
+      where: {
         id,
       },
       data,
