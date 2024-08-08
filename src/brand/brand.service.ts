@@ -1,11 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Brand, Prisma } from '@prisma/client';
 import { CreateBrandDto } from './dto/create-brand.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class BrandService {
-  constructor(private readonly prisma:PrismaService){}
+  constructor(private readonly prisma:PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager:Cache
+  ){}
 
   async create(createBrandDto: CreateBrandDto):Promise<Brand> {
     const brand=await this.prisma.brand.create({
@@ -15,7 +19,18 @@ export class BrandService {
   }
 
   async findAll() {
-    return this.prisma.brand.findMany()
+    const todos=await this.cacheManager.get('todos')
+    console.log(todos);
+    if(todos){
+      return todos
+    }
+    const response=await this.prisma.brand.findMany()
+
+    if(response){
+      await this.cacheManager.set('todos', response)
+      return response
+    }
+    return []
   }
 
   async findOne(id: string) {

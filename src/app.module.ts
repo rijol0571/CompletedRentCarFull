@@ -17,10 +17,11 @@ import { PaymentsModule } from './payments/payments.module';
 import { RentalsModule } from './rentals/rentals.module';
 import { EmailVerificationModule } from './email_verification/email_verification.module';
 import { TokenManagementModule } from './token_management/token_management.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 
 @Module({
-  imports: [FileModule, UserModule, CompanyModule, ModelModule, CarModule, TransactionModule, AuthModule, BrandModule, CarImageModule, CarFindexModule, ColoursModule, ContactsModule, CustomersModule, FindexModule, PaymentsModule, RentalsModule, EmailVerificationModule, TokenManagementModule],
+  imports:[ CacheModule.register(),FileModule, UserModule, CompanyModule, ModelModule, CarModule, TransactionModule, AuthModule, BrandModule, CarImageModule, CarFindexModule, ColoursModule, ContactsModule, CustomersModule, FindexModule, PaymentsModule, RentalsModule, EmailVerificationModule, TokenManagementModule],
   controllers: [],
   providers: [],
 })
