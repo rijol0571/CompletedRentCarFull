@@ -9,7 +9,7 @@ async function bootstrap() {
   const config=new DocumentBuilder()
     .addBearerAuth()
     .setTitle('RentCar')
-    .setDescription(`The Backend part of this project is done by Umidjon Izzatullayev
+    .setDescription(`The Backend part of this project is done by Umidjon Izzatullayev \n
       For Contact Info: @Umidjon_Izzatullayev `)
     .setVersion('1.0')
     .addTag('RentCar')
