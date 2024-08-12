@@ -1,7 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+
+import { AppModule } from './app.module';
+
 
 async function bootstrap() {
   const app=await NestFactory.create(AppModule)
@@ -9,16 +11,15 @@ async function bootstrap() {
   const config=new DocumentBuilder()
     .addBearerAuth()
     .setTitle('RentCar')
-    .setDescription(`The Backend part of this project is done by Umidjon Izzatullayev \n
-      For Contact Info: @Umidjon_Izzatullayev `)
+    .setDescription(`If there are problems, Contact with me: @jumadullayevrustam85@gmail.com`)
     .setVersion('1.0')
     .addTag('RentCar')
     .build()
   const document=SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
-  const port=process.env.PORT ||3003
+  const port=process.env.PORT ||3010
   await app.listen(port, ()=>{
-    console.log('running on port', port);
+    console.log('Every thing is good on', port);
     
   });
 }

@@ -1,23 +1,25 @@
 import { Module } from '@nestjs/common';
-import { FileModule } from './file/file.module';
-import { UserModule } from './user/user.module';
-import { CompanyModule } from './company/company.module';
-import { ModelModule } from './model/model.module';
-import { CarModule } from './car/car.module';
-import { TransactionModule } from './transaction/transaction.module';
-import { AuthModule } from './auth/auth.module';
-import { BrandModule } from './brand/brand.module';
-import { CarImageModule } from './car_image/car_image.module';
-import { CarFindexModule } from './car_findex/car_findex.module';
-import { ColoursModule } from './colours/colours.module';
-import { ContactsModule } from './contacts/contacts.module';
-import { CustomersModule } from './customers/customers.module';
-import { FindexModule } from './findex/findex.module';
-import { PaymentsModule } from './payments/payments.module';
-import { RentalsModule } from './rentals/rentals.module';
-import { EmailVerificationModule } from './email_verification/email_verification.module';
-import { TokenManagementModule } from './token_management/token_management.module';
 import { CacheModule } from '@nestjs/cache-manager';
+
+import { FileModule } from './Files/file.module';
+import { UserModule } from './Users/user.module';
+import { CompanyModule } from './Companies/company.module';
+import { ModelModule } from './Modeles/model.module';
+import { CarModule } from './Cars/car.module';
+import { TransactionModule } from './Transactions/transaction.module';
+import { AuthModule } from './Authjon/auth.module';
+import { BrandModule } from './Brands/brand.module';
+import { CarImageModule } from './CarImage/car_image.module';
+import { CarFindexModule } from './CarFindex/car_findex.module';
+import { ColoursModule } from './Colors/colours.module';
+import { ContactsModule } from './Contakts/contacts.module';
+import { CustomersModule } from './Custamers/customers.module';
+import { FindexModule } from './Findexes/findex.module';
+import { PaymentsModule } from './Payment/payments.module';
+import { RentalsModule } from './Rental/rentals.module';
+import { EmailVerificationModule } from './EmailVerification/email_verification.module';
+import { TokenManagementModule } from './TokenManagement/token_management.module';
+
 
 
 @Module({
